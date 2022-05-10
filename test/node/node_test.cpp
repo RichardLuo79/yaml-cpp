@@ -674,6 +674,29 @@ TEST(NodeTest, AccessNonexistentKeyOnConstNode) {
   ASSERT_FALSE(other["5"]);
 }
 
+TEST(NodeTest, StringViewTest) {
+  YAML::Node node;
+  std::string str = "string";
+  std::string_view strv(str);
+
+  node[str] = "6";
+  EXPECT_EQ(node[str], node[strv]);
+  node[strv] = "7";
+  EXPECT_EQ(node[str], node[strv]);
+
+  str[0] = 'S';
+  node[strv] = "8";
+  EXPECT_EQ(node[str].as<std::string>(), "8");
+  EXPECT_EQ(node["string"].as<std::string>(), "7");
+
+  std::string str2 = "s";
+  strv = str2;
+  node[strv] = "9";
+  EXPECT_EQ(node[str2], node[strv]);
+  EXPECT_EQ(node[str].as<std::string>(), "8");
+  EXPECT_EQ(node["string"].as<std::string>(), "7");
+}
+
 class NodeEmitterTest : public ::testing::Test {
  protected:
   void ExpectOutput(const std::string& output, const Node& node) {

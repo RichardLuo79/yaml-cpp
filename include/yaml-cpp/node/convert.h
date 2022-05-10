@@ -72,6 +72,21 @@ struct convert<std::string> {
   }
 };
 
+#if __cplusplus >= 201703L
+// std::string_view
+template <>
+struct convert<std::string_view> {
+  static Node encode(const std::string_view& rhs) { return Node(std::string(rhs)); }
+
+  static bool decode(const Node& node, std::string_view& rhs) {
+    if (!node.IsScalar())
+      return false;
+    rhs = node.Scalar();
+    return true;
+  }
+};
+#endif
+
 // C-strings can only be encoded
 template <>
 struct convert<const char*> {
